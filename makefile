@@ -9,7 +9,7 @@ BINLIB=BRAPP
 
 # library for data
 #FILELIB=WSCFIL
-FILELIB=BRAPP
+FILELIB=WSCFIL
 
 #-------------------------------------------------------------------------------------------
 # --- Standard variables ------------------------------------------- Do Not Change ---------
@@ -43,7 +43,7 @@ LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCFIL CMSFIL
 
 
 # list of objects for your binding directory
-#BNDDIRLIST = getModules.entrymod
+BNDDIRLIST = getModules.entrymod
 
 # everything you want to build here
 all: getModules.pgm
@@ -68,7 +68,7 @@ getModules.bnddir: $(BNDDIRLIST)
 
 %.bnddir:
 	-system -q "CRTBNDDIR BNDDIR($(BINLIB)/$*)"
-	-system -q "ADDBNDDIRE BNDDIR($(BINLIB)/$*) OBJ($(patsubst %.entrysrv,(*LIBL/% *SRVPGM *IMMED), $(patsubst %.entrymod,(*LIBL/% *MODULE *IMMED),$^)))"
+	-system -q "ADDBNDDIRE BNDDIR($(BINLIB)/$*) OBJ($(patsubst %.entrymod,(*LIBL/% *MODULE *IMMED),$^)))"
 	@touch $^
 	@touch $@
 
