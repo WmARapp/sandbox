@@ -4,10 +4,12 @@
 #-------------------------------------------------------------------------------------------
 
 # library for programs
-BINLIB=WSCLIB
+#BINLIB=WSCLIB
+BINLIB=BRAPP
 
 # library for data
-FILELIB=WSCFIL
+#FILELIB=WSCFIL
+FILELIB=BRAPP
 
 #-------------------------------------------------------------------------------------------
 # --- Standard variables ------------------------------------------- Do Not Change ---------
@@ -41,22 +43,22 @@ LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCFIL CMSFIL
 
 
 # list of objects for your binding directory
-BNDDIRLIST = empclshst.entrymod logerrors.entrysrv
+#BNDDIRLIST = getRelatedMod.entrymod
 
 # everything you want to build here
-all: empoccchg.sqlobj uclxref.sqlobj return_employee_occupation_description.sqlobj empclshst.pgm unxrefcnx.cnxpgm
+all: getRelatedMod.pgm
 
 
 # dependency lists
-empclshst.pgm: empclshst.bnddir empclshst.rpgmod
-empclshst.rpgmod: source/empclshst.sqlrpgle
+getRelated.pgm: getRelatedMod.bnddir getRelatedmod.rpgmod
+getRelatedMod.rpgmod: source/getRelatedMod.sqlrpgle
 
-empclshst.bnddir: $(BNDDIRLIST)
+getRelatedMod.bnddir: $(BNDDIRLIST)
 
-empoccchg.sqlobj: source/empoccchg.sql 
-empoccchg.sqlobj: source/empoccchg.sql 
-uclxref.sqlobj: source/uclxref.sql
-return_employee_occupation_description.sqlobj: source/return_employee_occupation_description.sql
+#empoccchg.sqlobj: source/empoccchg.sql 
+#empoccchg.sqlobj: source/empoccchg.sql 
+#uclxref.sqlobj: source/uclxref.sql
+#return_employee_occupation_description.sqlobj: source/return_employee_occupation_description.sql
 
 
 #-------------------------------------------------------------------------------------------
