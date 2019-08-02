@@ -43,17 +43,17 @@ LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCFIL CMSFIL
 
 
 # list of objects for your binding directory
-#BNDDIRLIST = getRelatedMod.entrymod
+#BNDDIRLIST = getModules.entrymod
 
 # everything you want to build here
-all: getRelatedMod.pgm
+all: getModules.pgm
 
 
 # dependency lists
-getRelated.pgm: getRelatedMod.bnddir getRelatedmod.rpgmod
-getRelatedMod.rpgmod: source/getRelatedMod.sqlrpgle
+getModules.pgm: getModules.bnddir getModules.rpgmod
+getModules.rpgmod: source/getModules.sqlrpgle
 
-getRelatedMod.bnddir: $(BNDDIRLIST)
+getModules.bnddir: $(BNDDIRLIST)
 
 #empoccchg.sqlobj: source/empoccchg.sql 
 #empoccchg.sqlobj: source/empoccchg.sql 
