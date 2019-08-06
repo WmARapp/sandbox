@@ -9,7 +9,7 @@ BINLIB=BRAPP
 
 # library for data
 #FILELIB=WSCFIL
-FILELIB=WSCFIL
+FILELIB=BRAPP
 
 #-------------------------------------------------------------------------------------------
 # --- Standard variables ------------------------------------------- Do Not Change ---------
@@ -34,24 +34,27 @@ endif
 
 
 #-------------------------------------------------------------------------------------------
-# --- Project Specific ---------------------------------------- Edit for this Project ------
+# --- Project Specific  ---------------------------------------- Edit for this Project ------
 #-------------------------------------------------------------------------------------------
 
 
 # your library list for rpg compiles
-LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCFIL CMSFIL
+LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCLIB WSCFIL CMSFIL
 
 
 # list of objects for your binding directory
 BNDDIRLIST = getmodules.entrymod
 
 # everything you want to build here
-all: getmodules.pgm
+all: getmodules.rpgmod getmodules.pgm
 
 
 # dependency lists
 getmodules.pgm: getmodules.bnddir getmodules.rpgle
-getmodules.rpgmod: source/getmodules.rpgle
+getsrvpgm.pgm: getsrvpgm.bnddir getsrvpgm.rpgle
+	#
+	getmodules.rpgmod: source/getmodules.rpgle
+getsrvpgm.rpgmod: source/getsrvpgm.rpgle
 
 getmodules.bnddir: $(BNDDIRLIST)
 
