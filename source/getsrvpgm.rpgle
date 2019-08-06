@@ -18,8 +18,8 @@
      Dcl-s ObjectLibrary    Char(10);
 
      Dcl-PR EC_Escape;
-       Whenx           Char(60)  const;
-       CallStackCnt    Int(10)  value;
+       Whenx           Char(60)     const;
+       CallStackCnt    Int(10)      value;
        ErrorCode       Char(32766)  options(*varsize);
      end-pr;
 
@@ -105,14 +105,14 @@
      dcl-s Entry       int(10);
 
      dcl-PR Main ExtPgm('GetSrvPgm');
-        searchlibrary    Char(10);
-        ObjectLibrary    Char(10);
+        prSearchlibrary    Char(10);
+        prObjectLibrary    Char(10);
      end-PR;
 
-     dcl-pi main;
+     dcl-PI main;
         searchlibrary    Char(10);
         ObjectLibrary    Char(10);
-     end-pi;
+     end-PI;
 
 
 
@@ -216,8 +216,8 @@
 
      Dcl-PI *N;
         Whenx           char(60)    const;
-        CallStackCnt    int(10);
-        ErrorCode       varchar(32766);
+        CallStackCnt    int(10)     value;
+        ErrorCode       char(32766) options(*varsize);
      End-PI;
 
       // Send Program Message API
