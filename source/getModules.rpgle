@@ -1,4 +1,5 @@
-     H DFTACTGRP(*NO) OPTION(*SRCSTMT: *NODEBUGIO)
+     H*DFTACTGRP(*NO) OPTION(*SRCSTMT: *NODEBUGIO)
+     H OPTION(*SRCSTMT: *NODEBUGIO)
 
      **  This program will find all places that a bound module is called.
      **    (by searching all ILE programs in the user libraries)
