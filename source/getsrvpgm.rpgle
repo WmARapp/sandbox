@@ -101,17 +101,22 @@
        dsPgm_SrcDat    Char(13);
      end-ds;
 
-     dcl-s peModule    char(10);
-     dcl-s Entry       int(10);
+     // dcl-s peModule    char(10);
+
+     dcl-s Searchlibrary  Char(10);
+     dcl-s OSbjectlibrary Char(20);
+     dcl-s Entry          int(10);
+     dcl-s peModule       Char(10);
+
 
      dcl-PR Main ExtPgm('GetSrvPgm');
+        peModule         Char(10);
         Searchlibrary    Char(10);
-        ObjectLibrary    Char(10);
      end-PR;
 
      dcl-PI main;
-        searchlibrary    Char(10);
-        ObjectLibrary    Char(10);
+        peModule         Char(10);
+        Searchlibrary    Char(10);
      end-PI;
 
 
