@@ -110,7 +110,7 @@
 
 
 
-       // except PrtHeader;
+       // ALL program; service programs
 
        // Create a user space to stuff module info into
        QUSCRTUS( 'MODULES   QTEMP'
