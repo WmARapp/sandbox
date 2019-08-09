@@ -9,7 +9,7 @@
       //         Scott Klement,  May 7, 1997
       //
 
-     Dcl-F SRVPGMMODE USAGE(*OUTPUT);
+      // Dcl-F QSYSPRT  PRINTER OFLIND(*INOF);
 
       //
       //  Field Definitions.
@@ -88,7 +88,7 @@
       // (these fields are the same in both APIs)
      dcl-s p_Entry    Pointer;
 
-     dcl-ds dsPgm       based(p_Entry);
+     dcl-ds dsPgm     based(p_Entry);
        dsPgm_Pgm       Char(10);
        dsPgm_PgmLib    Char(10);
        dsPgm_Module    Char(10);
@@ -161,15 +161,7 @@
 
        for Entry = 1 to dsLHEntCnt;
          if dsPgm_Module = peModule;
-
-           Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_SrcE   = dsPgm_SrcF;
-           Pgm_SrcLib = dsPgm_SrcLib;
-           Pgm_SrcMbr = dsPgm_SrcMbr;
-           Pgm_SrcDat = dsPgm_SrcDat;
-
-           write srvpgmModR;
-
+           // except PrtModule;
          endif;
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;
@@ -193,16 +185,7 @@
 
        for Entry = 1 to dsLHEntCnt;
          if dsPgm_Module = peModule;
-           Pgm_Pgm = dsPgm_Pgm;
-
-           Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_SrcE   = dsPgm_SrcF;
-           Pgm_SrcLib = dsPgm_SrcLib;
-           Pgm_SrcMbr = dsPgm_SrcMbr;
-           Pgm_SrcDat = dsPgm_SrcDat;
-
-           write srvpgmModR;
-
+           // except PrtModule;
          endif;
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;

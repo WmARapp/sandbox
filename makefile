@@ -11,6 +11,7 @@ BINLIB=BRAPP
 #FILELIB=WSCFIL
 FILELIB=BRAPP
 
+
 #-------------------------------------------------------------------------------------------
 # --- Standard variables ------------------------------------------- Do Not Change ---------
 #-------------------------------------------------------------------------------------------
@@ -32,6 +33,8 @@ ifeq ($(USER_UPPER), $(findstring $(USER_UPPER),$(CURDIR)))
     include  ~/binlib.inc
 endif
 
+#path for source
+VPATH = source:header
 
 #-------------------------------------------------------------------------------------------
 # --- Project Specific  ---------------------------------------- Edit for this Project ------
@@ -39,40 +42,42 @@ endif
 
 
 # your library list for rpg compiles
-LIBLIST= VALENCE52 $(FILELIB) $(BINLIB) WSCLIB WSCFIL CMSFIL
-
+LIBLIST= VALENCE52  CMSFIL  WSCFIL WSCLIB $(FILELIB) $(BINLIB)
 
 # list of objects for your binding directory
 
 BNDDIRLIST = getsrvpgm.entrymod
 
 # everything you want to build here
-all: getsrvpgm.pgm
+all: getsrvpgm.pgm getsrvpgm.rpgle
 
 
 # dependency lists
 
 getsrvpgm.pgm: getsrvpgm.bnddir getsrvpgm.rpgle
-	#
-
 getsrvpgm.rpgle: source/getsrvpgm.rpgle
 
 getsrvpgm.bnddir: $(BNDDIRLIST)
-
-#empoccchg.sqlobj: source/empoccchg.sql 
-#empoccchg.sqlobj: source/empoccchg.sql 
-#uclxref.sqlobj: source/uclxref.sql
-#return_employee_occupation_description.sqlobj: source/return_employee_occupation_description.sql
 
 
 #-------------------------------------------------------------------------------------------
 # --- Standard Build Rules ------------------------------------- Do Not Change -------------
 #-------------------------------------------------------------------------------------------
 
+%.sqlobj: %.sql
+
+%.sqlrpgmod: %.sqlrpgle
+
+%.rpgmod: %.rpgle
+
+%.cnxmod: %.sqlrpgle
+
+
+
 
 %.bnddir:
 	-system -q "CRTBNDDIR BNDDIR($(BINLIB)/$*)"
-	-system -q "ADDBNDDIRE BNDDIR($(BINLIB)/$*) OBJ($(patsubst %.entrymod,(*LIBL/% *MODULE *IMMED),$^)))"
+	-system -q "ADDBNDDIRE BNDDIR($(BINLIB)/$*) OBJ($(patsubst %.entrysrv,(*LIBL/% *SRVPGM *IMMED), $(patsubst %.entrymod,(*LIBL/% *MODULE *IMMED),$(BNDDIRLIST))))"
 	@touch $^
 	@touch $@
 
@@ -84,9 +89,10 @@ getsrvpgm.bnddir: $(BNDDIRLIST)
 	rm ./source/$*.sql2
 	@touch $@
 
-%.rpgmod:
+
+%.sqlrpgmod:
 	liblist -a $(LIBLIST);\
-	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./$<') \
+	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
 	COMMIT(*NONE) OBJTYPE(*MODULE) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
 	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')" 
 	@touch $@
@@ -99,8 +105,18 @@ getsrvpgm.bnddir: $(BNDDIRLIST)
 	RPGPPOPT(*LVL2) \
 	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')"; 
 	@touch $@
+	
+	
+%.cnxmod:
+	liblist -a $(LIBLIST);\
+	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
+	COMMIT(*NONE) OBJTYPE(*PGM) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
+	RPGPPOPT(*LVL2) \
+	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')"; 
+	@touch $@	
+	
 
-%.rpgle:
+%.rpglemod:
 	liblist -a $(LIBLIST);\
 	system "CRTRPGMOD MODULE($(BINLIB)/$*) SRCSTMF('./source/$*.rpgle') DBGVIEW($(DBGVIEW)) REPLACE(*YES)" 
 	@touch $@
@@ -111,11 +127,13 @@ getsrvpgm.bnddir: $(BNDDIRLIST)
 	system "CRTPGM PGM($(BINLIB)/$*)  BNDDIR($(BINLIB)/$*) REPLACE(*YES)"
 	@touch $@
 
+
 %.clle: 
 	-system -q "CRTSRCPF FILE($(BINLIB)/QCLLESRC) RCDLEN(112)"
 	system "CPYFRMSTMF FROMSTMF('./source/$*.clle') TOMBR('/QSYS.lib/$(BINLIB).lib/QCLLESRC.file/$*.mbr') MBROPT(*replace)"
 	liblist -a $(LIBLIST); system "CRTBNDCL PGM($(BINLIB)/$*) SRCFILE($(BINLIB)/QCLLESRC)"
 	@touch $@
+
 
 %.srvpgm:
     # We need the binder source as a member! SRCSTMF on CRTSRVPGM not available on all releases.
