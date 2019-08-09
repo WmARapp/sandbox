@@ -167,10 +167,15 @@
        for Entry = 1 to dsLHEntCnt;
          if dsPgm_Module = peModule;
 
+           Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_SrcE   = dsPgm_SrcF;
+           Pgm_Module = dsPgm-Module;
+           Pgm_ModLib = dsPgm-Module;
+           Pgm_SrcF   = dsPgm_SrcF;
            Pgm_SrcLib = dsPgm_SrcLib;
            Pgm_SrcMbr = dsPgm_SrcMbr;
+           Pgm_Attrib = dsPgm_Attrib;
+           Pgm_CrtDat = dsPgm_CrtDat;
            Pgm_SrcDat = dsPgm_SrcDat;
 
            write srvpgmModR;
@@ -198,12 +203,16 @@
 
        for Entry = 1 to dsLHEntCnt;
          if dsPgm_Module = peModule;
-           Pgm_Pgm = dsPgm_Pgm;
 
+           Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_SrcE   = dsPgm_SrcF;
+           Pgm_Module = dsPgm-Module;
+           Pgm_ModLib = dsPgm-Module;
+           Pgm_SrcF   = dsPgm_SrcF;
            Pgm_SrcLib = dsPgm_SrcLib;
            Pgm_SrcMbr = dsPgm_SrcMbr;
+           Pgm_Attrib = dsPgm_Attrib;
+           Pgm_CrtDat = dsPgm_CrtDat;
            Pgm_SrcDat = dsPgm_SrcDat;
 
            write srvpgmModR;

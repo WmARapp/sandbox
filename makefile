@@ -49,13 +49,13 @@ LIBLIST= VALENCE52  CMSFIL  WSCFIL WSCLIB $(FILELIB) $(BINLIB)
 BNDDIRLIST = getsrvpgm.entrymod
 
 # everything you want to build here
-all: getsrvpgm.pgm getsrvpgm.rpgle
+all: getsrvpgm.pgm getsrvpgm.rpglemod
 
 
 # dependency lists
 
-getsrvpgm.pgm: getsrvpgm.bnddir getsrvpgm.rpgle
-getsrvpgm.rpgle: source/getsrvpgm.rpgle
+getsrvpgm.pgm: getsrvpgm.bnddir getsrvpgm.rpglemod
+getsrvpgm.rpglemod: source/getsrvpgm.rpgle
 
 getsrvpgm.bnddir: $(BNDDIRLIST)
 
