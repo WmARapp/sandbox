@@ -202,7 +202,8 @@
        p_Entry = p_Header + dsLHLstOff;
 
        for Entry = 1 to dsLHEntCnt;
-         if dsPgm_Module = peModule;
+       //  if dsPgm_Module = peModule;
+         if dsPgm_Pgm = peModule;
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
