@@ -3,19 +3,7 @@
 
      Ctl-Opt Option(*Srcstmt: *Nodebugio);
 
-      //  This program will find all places that a bound module is called.
-      //    (by searching all ILE programs in the user libraries)
-      //
-      //         Scott Klement,  May 7, 1997
-      //
-
      Dcl-F SRVPGMMODE USAGE(*OUTPUT);
-
-      //
-      //  Field Definitions.
-      //
-     // Dcl-s searchlibrary    Char(10);
-     // Dcl-s ObjectLibrary    Char(10);
 
      Dcl-PR EC_Escape;
        Whenx           Char(60)     const;
@@ -101,12 +89,13 @@
        dsPgm_SrcDat    Char(13);
      end-ds;
 
-     // dcl-s peModule    char(10);
+      //
+      //  Global Field Definitions.
+      //
 
-     // dcl-s Searchlibrary  Char(10);
      dcl-s Objectlibrary  Char(20);
      dcl-s Entry          int(10);
-     // dcl-s peModule       Char(10);
+
 
 
      dcl-PR Main ExtPgm('RtvSrvPgm');
@@ -149,7 +138,7 @@
 
        // List all ILE programs modules to space
        QBNLPGMI( 'MODULES   QTEMP'
-               : 'PGML0100'
+               : 'PGML0200'
                : objectLibrary
                : dsEC
                );
@@ -165,7 +154,7 @@
        p_Entry = p_Header + dsLHLstOff;
 
        for Entry = 1 to dsLHEntCnt;
-         if dsPgm_Module = peModule;
+         // if dsPgm_Module = peModule;
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
@@ -180,7 +169,7 @@
 
            write srvpgmModR;
 
-         endif;
+         // endif;
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;
 
@@ -203,7 +192,7 @@
 
        for Entry = 1 to dsLHEntCnt;
        //  if dsPgm_Module = peModule;
-         if dsPgm_Pgm = peModule;
+         // if dsPgm_Pgm = peModule;
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
@@ -218,30 +207,12 @@
 
            write srvpgmModR;
 
-         endif;
+         // endif;
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;
 
-       // And that's about the size of it
-       *inlr = *on;
-
-
-
-     //OQSYSPRT   E            PrtHeader         2  3
-     //o                       *DATE         Y     10
-     //o                                           +3 'Listing of programs'
-     //o                                           +1 'that use module'
-     //o                       peModule            +1
-     //o                                           75 'Page'
-     //o                       PAGE          Z     80
-
-     //o          E            PrtModule         2  3
-     //o                       dsPgm_Pgm           10
-     //o                       dsPgm_PgmLib        +1
-     //o                       dsPgm_SrcF          +1
-     //o                       dsPgm_SrcLib        +1
-     //o                       dsPgm_SrcMbr        +1
-     //o                       dsPgm_SrcDat        +1
+      // And that's about the size of it
+     *inlr = *on;
 
       // Send back an escape message based on an API error code DS
      DCL-PROC EC_Escape ;
