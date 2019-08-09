@@ -58,7 +58,7 @@
      dcl-s p_Header    pointer;
 
      dcl-ds dsLH    BASED(p_Header);
-      //                                     Filler
+      // Filler
        dsLHFill1     char(103);
       //  Status (I=Incomplete,C=Complete
        dsLHStatus    char(1);
@@ -110,7 +110,7 @@
 
 
 
-       // ALL program; service programs
+       // ALL program; service programs  with ADD
 
        // Create a user space to stuff module info into
        QUSCRTUS( 'MODULES   QTEMP'
