@@ -104,7 +104,7 @@
      // dcl-s peModule    char(10);
 
      // dcl-s Searchlibrary  Char(10);
-     dcl-s OSbjectlibrary Char(20);
+     dcl-s Objectlibrary  Char(20);
      dcl-s Entry          int(10);
      // dcl-s peModule       Char(10);
 
@@ -169,7 +169,7 @@
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_Module = dsPgm_-Module;
+           Pgm_Module = dsPgm_Module;
            Pgm_ModLib = dsPgm_ModLib;
            Pgm_SrcF   = dsPgm_SrcF;
            Pgm_SrcLib = dsPgm_SrcLib;
@@ -206,8 +206,8 @@
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
-           Pgm_Module = dsPgm-Module;
-           Pgm_ModLib = dsPgm-Module;
+           Pgm_Module = dsPgm_Module;
+           Pgm_ModLib = dsPgm_ModLib;
            Pgm_SrcF   = dsPgm_SrcF;
            Pgm_SrcLib = dsPgm_SrcLib;
            Pgm_SrcMbr = dsPgm_SrcMbr;
