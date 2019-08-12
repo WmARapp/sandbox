@@ -1,49 +1,11 @@
 **FREE
-      //DFTACTGRP(*NO) OPTION(*SRCSTMT: *NODEBUGIO)
+       //DFTACTGRP(*NO) OPTION(*SRCSTMT: *NODEBUGIO)
 
-     Ctl-Opt Option(*Srcstmt: *Nodebugio);
+       Ctl-Opt Option(*Srcstmt: *Nodebugio);
 
-     Dcl-F SRVPGMMODE USAGE(*OUTPUT);
+       Dcl-F SRVPGMMODE USAGE(*OUTPUT);
 
-     Dcl-PR EC_Escape;
-       Whenx           Char(60)     const;
-       CallStackCnt    Int(10)      value;
-       ErrorCode       Char(32766)  options(*varsize);
-     end-pr;
-
-      // List ILE program information API
-     Dcl-PR QBNLPGMI    ExtPgm('QBNLPGMI');
-       UsrSpc     Char(20)     const;
-       Format     Char(8)      const;
-       PgmName    Char(20)     const;
-       Errors     Char(32766)  options(*varsize);
-     end-pr;
-
-      // List ILE service program information API
-     Dcl-PR QBNLSPGM    ExtPgm('QBNLSPGM');
-       UsrSpc    Char(20)     const;
-       Format    Char(8)      const;
-       SrvPgm    Char(20)     const;
-       Errors    Char(32766)  options(*varsize);
-     end-pr;
-
-      // Create User Space API
-     Dcl-Pr QUSCRTUS    ExtPgm('QUSCRTUS');
-       UsrSpc       Char(20)     const;
-       ExtAttr      Char(10)     const;
-       InitSize     Int(10)      const;
-       InitVal      Char(1)      const;
-       PublicAuth   Char(10)     const;
-       Text         Char(50)     const;
-       Replace      Char(10)     const;
-       Errors       Char(32766)  options(*varsize);
-     end-pr;
-
-      // Retrieve pointer to user space API
-     Dcl-PR QUSPTRUS    ExtPgm('QUSPTRUS');
-       UsrSpc     Char(20)   const;
-       Pointer    pointer;
-     end-pr;
+     /copy 'header/apipgmi'
 
       // API error code structure
      dcl-ds dsEC;
@@ -54,11 +16,13 @@
        dsECMsgDta    Char(240);
      end-ds;
 
+      //
       //  List API generic header structure
+      //
      dcl-s p_Header    pointer;
 
      dcl-ds dsLH    BASED(p_Header);
-      // Filler
+      //  Filler
        dsLHFill1     char(103);
       //  Status (I=Incomplete,C=Complete
        dsLHStatus    char(1);
@@ -89,30 +53,57 @@
        dsPgm_SrcDat    Char(13);
      end-ds;
 
-      //
+     // reformat parms
+     Dcl-DS inputParms;
+       SearchThis       Char(20);
+        ST_Library      Char(10) Overlay(SearchThis:1);
+        ST_Module       Char(10) Overlay(SearchThis:11);
+     End-DS;
+
+     // reformat returned service program
+     Dcl-DS returnedData;
+       ReturnThis       Char(20);
+        RT_PgmLib       Char(10) Overlay(ReturnThis:1);
+        RT_Pgm          Char(10) Overlay(ReturnThis:11);
+     End-DS;
+
       //  Global Field Definitions.
-      //
 
      dcl-s Objectlibrary  Char(20);
      dcl-s Entry          int(10);
 
-
+      // DSPSRVPGM DETAIL()
+      //
+      //  Single Values
+      //  *ALL
+      // Other Values
+      //  *BASIC       *tbd
+      //  *SIZE
+      //  *MODULE      *yes
+      //  *SRVPGM
+      //  *PROCEXP     *tbd
+      //  *DTAEXP
+      //  *ACTGRPEXP
+      //  *ACTGRPIMP
+      //  *SIGNATURE
+      //  *COPYRIGHT
 
      dcl-PR Main ExtPgm('RtvSrvPgm');
-        peModule         Char(10);
-        Searchlibrary    Char(10);
+        SearchModule     Char(10) OPTIONS(*NOPASS) CONST;
+        Searchlibrary    Char(10) OPTIONS(*NOPASS) CONST;
      end-PR;
 
      dcl-PI main;
-        peModule         Char(10);
-        Searchlibrary    Char(10);
+        SearchModule     Char(10) OPTIONS(*NOPASS) CONST;
+        Searchlibrary    Char(10) OPTIONS(*NOPASS) CONST;
      end-PI;
-
-
 
        // ALL program; service programs  with ADD
 
        // Create a user space to stuff module info into
+       // Create User Space (QUSCRTUS) API
+       // https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/apis/quscrtus.htm
+       //
        QUSCRTUS( 'MODULES   QTEMP'
                : 'USRSPC'
                : 5120*3072
@@ -130,15 +121,26 @@
                   );
        endif;
 
+       // Rtv Pointer to User Space
+       // Retrieve Pointer to User Space (QUSPTRUS) API
+       // https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/apis/qusptrus.htm
+       //
        QUSPTRUS( 'MODULES   QTEMP'
                : p_Header
                );
 
+       // skip this section
+       if 1 = 2;
        objectLibrary = '*ALL      ' + searchlibrary;
 
+       //
        // List all ILE programs modules to space
-       QBNLPGMI( 'MODULES   QTEMP'
-               : 'PGML0200'
+       // List ILE Program Information (QBNLPGMI) API
+       // https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/apis/qbnlpgmi.htm
+       //
+
+         QBNLPGMI( 'MODULES   QTEMP'
+                 : 'PGML0200'
                : objectLibrary
                : dsEC
                );
@@ -172,6 +174,8 @@
          // endif;
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;
+       // end of sipped section
+       endif;
 
        // List all ILE service program modules to space
        QBNLSPGM( 'MODULES   QTEMP'
@@ -191,8 +195,6 @@
        p_Entry = p_Header + dsLHLstOff;
 
        for Entry = 1 to dsLHEntCnt;
-       //  if dsPgm_Module = peModule;
-         // if dsPgm_Pgm = peModule;
 
            Pgm_Pgm    = dsPgm_Pgm;
            Pgm_PgmLib = dsPgm_PgmLib;
@@ -204,10 +206,24 @@
            Pgm_Attrib = dsPgm_Attrib;
            Pgm_CrtDat = dsPgm_CrtDat;
            Pgm_SrcDat = dsPgm_SrcDat;
+         // select by parms 1 and/or 2,  default to all
 
-           write srvpgmModR;
+         If %parms = 2;
+           // Format parms for compare
+           ST_Library = Searchlibrary;
+           ST_Module  = SearchModule;
+           // Format data for compare
+           RT_Pgm    = dsPgm_Pgm;
+           RT_PgmLib = dsPgm_PgmLib;
+           //  parms passed equal;
+           if SearchThis = ReturnThis;
+             write srvpgmModR;
+           EndIf;
 
-         // endif;
+           Else;
+             write srvpgmModR;
+         EndIf;
+
          p_Entry = p_Entry + dsLHEntSiz;
        endfor;
 

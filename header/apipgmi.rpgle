@@ -38,4 +38,3 @@
          UsrSpc     Char(20)   const;
          Pointer    pointer;
        End-pr;
-
