@@ -1,11 +1,10 @@
 **FREE
-    //DFTACTGRP(*NO) OPTION(*SRCSTMT: *NODEBUGIO)
 
     Ctl-Opt Option(*Srcstmt: *Nodebugio);
 
-    // Dcl-F SRVPGMMODS USAGE(*OUTPUT);
-
     /copy 'header/apipgmi'
+    /copy 'header/sqlerrhndl'
+
 
     // API error code structure
     dcl-ds dsEC;
@@ -73,7 +72,31 @@
      dcl-s Entry          int(10);
 
      dcl-s formatName     char(10);
-     dcl-c FORMATSPGL0100 const('SPGL0100');
+     // Format Nmae and usage based on cmd DSPSRVPGM
+     // Single Values
+     //  *ALL
+     // Other Values
+     //  *BASIC
+     //  *SIZE
+     //  *MODULE
+     //  *SRVPGM
+     //  *PROCEXP
+     //  *DTAEXP
+     //  *ACTGRPEXP
+     //  *ACTGRPIMP
+     //  *SIGNATURE
+     //  *COPYRIGHT
+     dcl-c FORMATSPGL0100 const('SPGL0100'); // module (*MODULE) information
+     dcl-c FORMATSPGL0100 const('SPGL0110'); //
+     dcl-c FORMATSPGL0100 const('SPGL0200'); // Service program (*SRVPGM) information
+     dcl-c FORMATSPGL0100 const('SPGL0300'); // Data items exported to the activation group (*ACTGRPEXP)
+     dcl-c FORMATSPGL0100 const('SPGL0400'); //
+     dcl-c FORMATSPGL0100 const('SPGL0500'); //
+     dcl-c FORMATSPGL0100 const('SPGL0600'); // Service program procedure export (*PROCEXP) information.
+     dcl-c FORMATSPGL0100 const('SPGL0610'); //
+     dcl-c FORMATSPGL0100 const('SPGL0700'); // Service program data export (*DTAEXP) information
+     dcl-c FORMATSPGL0100 const('SPGL0800'); // Service program signature (*SIGNATURE) information
+
      dcl-s speachMark     char(1) inz('''');
 
 
@@ -144,19 +167,6 @@
 
        for Entry = 1 to dsLHEntCnt;
 
-         SRVPGMNAME = dsPgm_Pgm;
-         SRVPGMLIB  = dsPgm_PgmLib;
-         MODNAME    = dsPgm_Module;
-         MODLIB     = dsPgm_ModLib;
-         SRCFILE    = dsPgm_SrcF;
-         SRCLIB     = dsPgm_SrcLib;
-         SRCNAME    = dsPgm_SrcMbr;
-         MODATTR    = dsPgm_Attrib;
-         MODCREATED = dsPgm_CrtDat;
-         SRCUPDATED = dsPgm_SrcDat;
-
-         ADDED_ON   = %TIMESTAMP();
-         ADDED_BY   = 'DB_ADMIN';
          // select by parms 1 and/or 2,  default to all
 
          if %parms = 2;
@@ -168,13 +178,17 @@
            RT_PgmLib = dsPgm_PgmLib;
            //  parms passed equal;
            if SearchThis = ReturnThis;
-             // write srvpgmModS;
-             insertRow();
+             //
+             if insertRow();
+               leave;
+             endif;
            endIf;
 
          else;
-           // write srvpgmModS;
-           insertRow();
+           //
+           if insertRow();
+             leave;
+           endif;
          endIf;
 
          p_Entry = p_Entry + dsLHEntSiz;
@@ -262,55 +276,44 @@
      Dcl-PI *N ind;
 
      End-PI;
-       // local variables
-       dcl-s addedTimeStamp   TimeStamp;
-       dcl-s updatedTimeStamp TimeStamp;
-       dcl-s addedUser        varchar(18);
-       dcl-s updatedUser      varchar(18);
 
+       // local variables
+       //
+
+       dcl-s addedUser        varchar(18);
        dcl-s passfail ind inz(*off);
 
        // local constants
-       dcl-c defaultTimestamp CONST('0001-01-01-01.00.00.000000');
-       dcl-c defaultUser      CONST('RTVSRVPGM');
+       //
 
-       addedTimeStamp   = defaultTimeStamp;
-       updatedTimeStamp = defaultTimeStamp;
-       addedUser        = defaultUser;
-       updatedUser      = defaultUser;
+       addedUser      = 'DB_ADMIN';
 
        Exec SQL
          insert into srvpgmmods
-           (SRVPGMNAME,
-            SRVPGMLIB,
-            MODNAME,
-            MODLIB,
-            SRCFILE,
-            SRCLIB,
-            SRCNAME,
+           (SRVPGMNAME, SRVPGMLIB,
+            MODNAME, MODLIB,
+            SRCFILE, SRCLIB, SRCNAME,
             MODATTR,
             MODCREATED,
             SRCUPDATED,
             ADDED_ON,
             ADDED_BY,
             UPDATED,
-            UPD_USER,
-
-         values(:SRVPGMNAME,
-                :SRVPGMLIB,
-                :MODNAME,
-                :MODLIB,
-                :SRCFILE,
-                :SRCLIB,
-                :SRCNAME,
-                :MODATTR,
-                :MODCREATED,
-                :SRCUPDATED,
-                :addedTimeStamp, :updatedTimeStamp, :addedUser, :updatedUser
+            UPD_USER
+          )
+         values(:dsPGM_Pgm, :dsPGM_PgmLib,
+                :dsPGM_Module, :dsPGM_ModLib,
+                :dsPGM_SrcF,
+                :dsPGM_SrcLib,
+                :dsPGM_SrcMbr,
+                :dsPGM_Attrib,
+                :dsPGM_CrtDat,
+                :dsPGM_SrcDat,
+                current timestamp, :addedUser, current timestamp, :addedUser
                );
 
       If xSQLState2 <> Success_On_SQL;
-        passfail = *off;
+        passfail = *on;
       EndIf;
 
       return passfail;

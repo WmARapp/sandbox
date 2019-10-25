@@ -1,13 +1,15 @@
-
+#
+#                              --- version 1.5 ----
+#
 #-------------------------------------------------------------------------------------------
 # --- Libraries ----------------------------------------------- Edit for this Project ------
 #-------------------------------------------------------------------------------------------
 
 # library for programs
-BINLIB=BRAPP
+BINLIB=WSCLIB
 
 # library for data
-FILELIB=BRAPP
+FILELIB=WSCFIL
 
 #-------------------------------------------------------------------------------------------
 # --- Standard variables ------------------------------------------- Do Not Change ---------
@@ -30,6 +32,13 @@ ifeq ($(USER_UPPER), $(findstring $(USER_UPPER),$(CURDIR)))
     include  ~/binlib.inc
 endif
 
+#Let's avoid duplicate libraries
+ifeq ($(FILELIB), $(BINLIB))
+    ADDLIBS=$(FILELIB)
+else
+    ADDLIBS=$(FILELIB) $(BINLIB)
+endif
+
 #path for source
 VPATH = source:header
 
@@ -39,28 +48,25 @@ VPATH = source:header
 
 
 # your library list for rpg compiles
-LIBLIST= VALENCE52 CMSFIL WSCFIL WSCLIB $(FILELIB) $(BINLIB)
+LIBLIST= VALENCE52  CMSFIL  WSCFIL WSCLIB $(ADDLIBS)
 
 
 # everything you want to build here
-all: rtvsrvpgm.pgm rtvsrvpgm.rpglemod
+all: rtvsrvpgm.pgm 
 #
 
 
 # dependency lists
 
-rtvsrvpgm.pgm: rtvsrvpgm.bnddir rtvsrvpgm.rpglemod
+rtvsrvpgm.pgm: rtvsrvpgm.bnddir rtvsrvpgm.sqlrpgmod
 
-rtvsrvpgm.rpglemod: source/rtvsrvpgm.rpgle
-
-rtvsrvpgm.bnddir: $(BNDDIRLIST)
-
+# list of objects for your binding directory
+rtvsrvpgm.bnddir: BNDDIRLIST = rtvsrvpgm.entrymod
 
 
 #-------------------------------------------------------------------------------------------
 # --- Standard Build Rules ------------------------------------- Do Not Change -------------
 #-------------------------------------------------------------------------------------------
-
 
 
 
@@ -79,7 +85,7 @@ rtvsrvpgm.bnddir: $(BNDDIRLIST)
 
 
 %.sqlrpgmod: %.sqlrpgle
-	liblist -a $(LIBLIST);\
+	-liblist -a $(LIBLIST);
 	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
 	COMMIT(*NONE) OBJTYPE(*MODULE) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
 	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')" 
@@ -87,8 +93,8 @@ rtvsrvpgm.bnddir: $(BNDDIRLIST)
 
 
 %.cnxpgm:
-	liblist -a $(LIBLIST);\
-	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \cd 
+	-liblist -a $(LIBLIST);
+	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
 	COMMIT(*NONE) OBJTYPE(*PGM) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
 	RPGPPOPT(*LVL2) \
 	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')"; 
@@ -96,22 +102,22 @@ rtvsrvpgm.bnddir: $(BNDDIRLIST)
 
 
 %.cnxmod: %.sqlrpgle
-	liblist -a $(LIBLIST);\
-	system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
-	COMMIT(*NONE) OBJTYPE(*PGM) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
+	-liblist -a $(LIBLIST);
+	-system "CRTSQLRPGI OBJ($(BINLIB)/$*) SRCSTMF('./source/$*.sqlrpgle') \
+	COMMIT(*NONE) OBJTYPE(*MODULE) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW($(DBGVIEW)) \
 	RPGPPOPT(*LVL2) \
 	compileopt('INCDIR(''$(CURDIR)''   ''/wright-service-corp/Utility'')')"; 
 	@touch $@	
 
 
 %.rpglemod: %.rpgle
-	liblist -a $(LIBLIST);\
+	-liblist -a $(LIBLIST);
 	system "CRTRPGMOD MODULE($(BINLIB)/$*) SRCSTMF('./source/$*.rpgle') DBGVIEW($(DBGVIEW)) REPLACE(*YES)" 
 	@touch $@
 
 
 %.rpglepgm: %.rpgle
-	liblist -a $(LIBLIST);\
+	-liblist -a $(LIBLIST);
 	system "CRTBNDRPG PGM($(BINLIB)/$*) SRCSTMF('./source/$*.rpgle') \
 	OPTION(*EVENTF) DBGVIEW(*SOURCE) REPLACE(*YES) \
 	INCDIR('$(CURDIR)'   '/wright-service-corp/Utility')";
@@ -119,31 +125,43 @@ rtvsrvpgm.bnddir: $(BNDDIRLIST)
 
 
 %.pgm:
-	liblist -a $(LIBLIST);\
+	-liblist -a $(LIBLIST);
 	system "CRTPGM PGM($(BINLIB)/$*)  BNDDIR($(BINLIB)/$*) REPLACE(*YES)"
 	@touch $@
 
 
 %.cllebndpgm:  %.clle
-	system -q "CRTSRCPF FILE($(BINLIB)/QCLLESRC) RCDLEN(112)"
+	-system -q "CRTSRCPF FILE($(BINLIB)/QCLLESRC) RCDLEN(92)"
 	system "CPYFRMSTMF FROMSTMF('./source/$*.clle') TOMBR('/QSYS.lib/$(BINLIB).lib/QCLLESRC.file/$*.mbr') MBROPT(*replace)"
-	liblist -a $(LIBLIST); 
+	system "CHGPFM FILE($(BINLIB)/QCLLESRC) MBR($*) SRCTYPE(CLLE)"
+	-liblist -a $(LIBLIST); 
 	system "CRTBNDCL PGM($(BINLIB)/$*) SRCFILE($(BINLIB)/QCLLESRC)"
 	@touch $@
 
 
-%cllemod: %.clle
-	system -q "CRTSRCPF FILE($(BINLIB)/QCLLESRC) RCDLEN(112)"
+%.cllemod: %.clle
+	-system -q "CRTSRCPF FILE($(BINLIB)/QCLLESRC) RCDLEN(92)"
 	system "CPYFRMSTMF FROMSTMF('./source/$*.clle') TOMBR('/QSYS.lib/$(BINLIB).lib/QCLLESRC.file/$*.mbr') MBROPT(*replace)"
-	liblist -a $(LIBLIST);
-	system "CRTCLMOD MODULE($(BINLIB)/$*) SRCFILE($(BINLIB)/QCLLESRC) SRCMBR($*) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW(*SOURCE)
+	system "CHGPFM FILE($(BINLIB)/QCLLESRC) MBR($*) SRCTYPE(CLLE)"
+	-liblist -a $(LIBLIST);
+	system "CRTCLMOD MODULE($(BINLIB)/$*) SRCFILE($(BINLIB)/QCLLESRC) SRCMBR($*) OPTION(*EVENTF) REPLACE(*YES) DBGVIEW(*SOURCE)"
+
+
+%.prtfile: %.prtf
+	-system -q "CRTSRCPF FILE($(BINLIB)/QDDSSRC) RCDLEN(112)"
+	system "CPYFRMSTMF FROMSTMF('./source/$*.prtf') TOMBR('/QSYS.lib/$(BINLIB).lib/QDDSSRC.file/$*.mbr') MBROPT(*replace)"
+	system "CHGPFM FILE($(BINLIB)/QCLLESRC) MBR($*) SRCTYPE(PRTF)"
+	system "CRTPRTF FILE($(BINLIB)/$*) SRCFILE($(BINLIB)/QDDSSRC) SRCMBR($*)"
+	@touch $@
 
 
 %.srvpgm:
-    # We need the binder source as a member! SRCSTMF on CRTSRVPGM not available on all releases.
-	system -q "CRTSRCPF FILE($(BINLIB)/QSRC) RCDLEN(112)"
+    # We need the binder source as a member! Also requires a bindir SRCSTMF on CRTSRVPGM not available on all releases.
+	-system -q "CRTSRCPF FILE($(BINLIB)/QSRC) RCDLEN(112)"
 	system "CPYFRMSTMF FROMSTMF('./header/$*.bndsrc') TOMBR('/QSYS.lib/$(BINLIB).lib/QSRC.file/$*.mbr') MBROPT(*replace)"
-	system "CRTSRVPGM SRVPGM($(BINLIB)/$*) MODULE($(patsubst %,$(BINLIB)/%,$(basename $^))) SRCFILE($(BINLIB)/QSRC)"
+	system "CHGPFM FILE($(BINLIB)/QCLLESRC) MBR($*) SRCTYPE(BND)"
+	-liblist -a $(LIBLIST);\
+	system "CRTSRVPGM SRVPGM($(BINLIB)/$*) BNDDIR($(BINLIB)/$*) SRCFILE($(BINLIB)/QSRC)"
 	@touch $@
 
 
