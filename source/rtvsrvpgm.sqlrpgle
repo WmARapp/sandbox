@@ -72,6 +72,7 @@
      dcl-s Entry          int(10);
 
      dcl-s formatName     char(10);
+
      // Format Nmae and usage based on cmd DSPSRVPGM
      // Single Values
      //  *ALL
@@ -104,6 +105,8 @@
      dcl-PR Main ExtPgm('RtvSrvPgm');
         SearchModule     char(10) OPTIONS(*NOPASS) CONST;
         Searchlibrary    char(10) OPTIONS(*NOPASS) CONST;
+        parm
+
      end-PR;
 
      dcl-PI main;
