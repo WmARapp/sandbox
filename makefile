@@ -52,16 +52,16 @@ LIBLIST= VALENCE52  CMSFIL  WSCFIL WSCLIB $(ADDLIBS)
 
 
 # everything you want to build here
-all: rtvsrvpgm.pgm 
+all: rtvsrvpgmw.pgm 
 #
 
 
 # dependency lists
 
-rtvsrvpgm.pgm: rtvsrvpgm.bnddir rtvsrvpgm.sqlrpgmod
+rtvsrvpgmw.pgm: rtvsrvpgm.bnddir rtvsrvpgmw.sqlrpgmod
 
 # list of objects for your binding directory
-rtvsrvpgm.bnddir: BNDDIRLIST = rtvsrvpgm.entrymod
+rtvsrvpgm.bnddir: BNDDIRLIST = rtvsrvpgmw.entrymod
 
 
 #-------------------------------------------------------------------------------------------

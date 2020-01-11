@@ -88,15 +88,15 @@
      //  *SIGNATURE
      //  *COPYRIGHT
      dcl-c FORMATSPGL0100 const('SPGL0100'); // module (*MODULE) information
-     dcl-c FORMATSPGL0100 const('SPGL0110'); //
-     dcl-c FORMATSPGL0100 const('SPGL0200'); // Service program (*SRVPGM) information
-     dcl-c FORMATSPGL0100 const('SPGL0300'); // Data items exported to the activation group (*ACTGRPEXP)
-     dcl-c FORMATSPGL0100 const('SPGL0400'); //
-     dcl-c FORMATSPGL0100 const('SPGL0500'); //
-     dcl-c FORMATSPGL0100 const('SPGL0600'); // Service program procedure export (*PROCEXP) information.
-     dcl-c FORMATSPGL0100 const('SPGL0610'); //
-     dcl-c FORMATSPGL0100 const('SPGL0700'); // Service program data export (*DTAEXP) information
-     dcl-c FORMATSPGL0100 const('SPGL0800'); // Service program signature (*SIGNATURE) information
+     // dcl-c FORMATSPGL0110 const('SPGL0110'); //
+     dcl-c FORMATSPGL0200 const('SPGL0200'); // Service program (*SRVPGM) information
+     // dcl-c FORMATSPGL0300 const('SPGL0300'); //
+     // dcl-c FORMATSPGL0400 const('SPGL0400'); //
+     // dcl-c FORMATSPGL0500 const('SPGL0500'); //
+     dcl-c FORMATSPGL0600 const('SPGL0600'); // Service program procedure export (*PROCEXP) information.
+     // dcl-c FORMATSPGL0610 const('SPGL0610'); //
+     dcl-c FORMATSPGL0700 const('SPGL0700'); // Service program data export (*DTAEXP) information
+     dcl-c FORMATSPGL0800 const('SPGL0800'); // Service program signature (*SIGNATURE) information
 
      dcl-s speachMark     char(1) inz('''');
 
@@ -149,7 +149,21 @@
        // set formatName for List type
        // https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/apis/qbnlspgm.htm
        //
-       formatName = formatSPGL0100;
+       // passed type of data to retreive
+       //
+       Select;
+         When typeOfInfo = 'MODULE_OBJECT';
+              formatName = FORMATSPGL0100;
+         When typeOfInfo = 'SRVPGM_OBJECT';
+              formatName = FORMATSPGL0200;
+         When typeOfInfo = 'PROC_EXPORT';
+              formatName = FORMATSPGL0600;
+         When typeOfInfo = 'DATA_EXPORT';
+              formatName = FORMATSPGL0700;
+         When typeOfInfo = 'SIGNATURE';
+              formatName = FORMATSPGL0800;
+       EndSl;
+
 
        // List all ILE service program modules to space
        QBNLSPGM( 'MODULES   QTEMP'
@@ -290,6 +304,37 @@
        //
 
        addedUser      = 'DB_ADMIN';
+       //
+       // passed type of data to retreive
+       //
+       Select;
+         When typeOfInfo = 'MODULE_OBJECT';
+              insertSPGL0100();
+         When typeOfInfo = 'SRVPGM_OBJECT';
+              insertSPGL0200();
+         When typeOfInfo = 'PROC_EXPORT';
+              insertSPGL0600();
+         When typeOfInfo = 'SIGNATURE';
+              insertSPGL0800();
+         When typeOfInfo = '*ALL';
+              insertSPGL0000();
+       EndSl;
+
+
+      If xSQLState2 <> Success_On_SQL;
+        passfail = *on;
+      EndIf;
+
+      return passfail;
+
+    End-Proc;
+
+    // insert entries
+    DCL-PROC insertinsertSPGL0100 ;
+
+    Dcl-PI *N ind;
+
+    End-PI;
 
        Exec SQL
          insert into srvpgmmods
@@ -306,9 +351,7 @@
           )
          values(:dsPGM_Pgm, :dsPGM_PgmLib,
                 :dsPGM_Module, :dsPGM_ModLib,
-                :dsPGM_SrcF,
-                :dsPGM_SrcLib,
-                :dsPGM_SrcMbr,
+                :dsPGM_SrcF, :dsPGM_SrcLib, :dsPGM_SrcMbr,
                 :dsPGM_Attrib,
                 :dsPGM_CrtDat,
                 :dsPGM_SrcDat,
