@@ -1,0 +1,57 @@
+
+             PGM        PARM(&USRPRF)
+
+
+
+  /**************************************************************************/
+  /*                                                                        */
+  /*  The information contained in this document has not been submitted     */
+  /*  to any formal tests and is distributed on an 'As is' basis            */
+  /*  without any warranty either expressed or implied. The use of this     */
+  /*  information or the implementation of any of these techniques is a     */
+  /*  customer responsibility and depends on the customer's ability to      */
+  /*  evaluate and integrate them into the customer's operation             */
+  /*  environment. While each item may have been reviewed by IBM            */
+  /*  for accuracy in a specific situation, there is no guarantee that the  */
+  /*  same or similar results will be obtained elsewhere. Customers         */
+  /*  attempting to adapt these techniques to their environments do so      */
+  /*  at their own risk.                                                    */
+  /*                                                                        */
+  /**************************************************************************/
+
+  /***********************************************************/
+  /*   This program calls the QZLSCHSI API to re-enable a    */
+  /*   disabled NetServer user profile.                      */
+  /*                                                         */
+  /*   Change Server Information (QZLSCHSI) API              */
+  /*                                                         */
+  /*   Required Parameter Group:                             */
+  /*                                                         */
+  /*   1  Request variable            Input   Char(*)        */
+  /*   2  Length of request variable  Input   Binary(4)      */
+  /*   3  Format                      Input   Char(8)        */
+  /*   4  Error Code                  I/O     Char(*)        */
+  /*                                                         */
+  /*     Default Public Authority: *USE                      */
+  /*                                                         */
+  /*     Threadsafe: No                                      */
+  /*                                                         */
+  /***********************************************************/
+
+             DCL        VAR(&USRPRF) TYPE(*CHAR) STG(*AUTO) LEN(10)
+             DCL        VAR(&RQSVAR) TYPE(*CHAR) LEN(14)
+             DCL        VAR(&RQSLEN) TYPE(*INT) VALUE(14)
+
+             DCLPRCOPT  TEXT('Reset NetServer User') USRPRF(*OWNER)
+
+ /* Note that the first part of the value below is four */
+ /* (4) spaces.  This sometimes appears compressed to   */
+ /* when viewed on the web.                             */
+
+             CHGVAR     VAR(&RQSVAR) VALUE('    ' *CAT &USRPRF)
+
+             CHGVAR     VAR(%BINARY(&RQSVAR 1 4)) VALUE(&RQSLEN)
+
+             CALL       QSYS/QZLSCHSI PARM(&RQSVAR &RQSLEN ZLSS0200 X'00000000')
+
+             ENDPGM
